@@ -18,7 +18,7 @@ class UnleashedObject extends Object {
 			self::$format = $format;
 		}
 	}
-	
+
 	static function post($class) {
 
 	}
@@ -38,16 +38,16 @@ class UnleashedObject extends Object {
 		$format = 'application/' . self::$format;
 
 		$headers = array(
-			'Content-Type' => $format,
-			'Accept' => $format,
-			'api-auth-id' => self::$api_id,
-			'api-auth-signature' => $signature
+			"Content-Type: $format",
+			"Accept: $format",
+			"api-auth-id: " . self::$api_id,
+			"api-auth-signature: $signature"
 		);
 
 		try { 
 			$curl = curl_init("https://api.unleashedsoftware.com/$class$params"); 
-			curl_setopt($curl, CURLINFO_HEADER_OUT, true); 
-			curl_setopt($curl, CURLOPT_HEADER , true); 
+			curl_setopt($curl, CURLINFO_HEADER_OUT, true);
+			curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 			curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0); 
 			curl_setopt($curl, CURLOPT_HTTPHEADER, $headers); 
 			curl_setopt($curl, CURLOPT_TIMEOUT, 20); 
@@ -55,7 +55,8 @@ class UnleashedObject extends Object {
 			error_log($result); 
 			curl_close($curl);
 			$function = self::$format . '2array';
-			return Convert::$function($result);
+			$result = Convert::$function($result);
+			return $result['Items'];
 		}
 		catch(Exception $e) { 
 			error_log("Unleashed Error: $e"); 
