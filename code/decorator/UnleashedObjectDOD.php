@@ -11,7 +11,7 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 	static $errors = array(
 		'U_OBJECT_DELETED' => array('Unleashed Object Not Found', "The Unleashed object had been created but can not be found anymore."),
 		'U_OBJECT_DUPLICATE' => array('Unleashed Object Already Created', "An Unleashed object with the same 'unique field' has been found.\nTherefore, this SS object can not create a new Unleashed object."),
-		'UNIQUE_FIELD_MISSING' => array('SS Object Unique Field Missing', "This SS object does not have a 'unique field' value set which is required in order to create a new Unleashed object.")
+		'SS_FIELD_MISSING' => array('SS $ClassName #$ID $Field Missing', "The SS \$ClassName #\$ID does not have a '\$Field' value set which is required in order to create a new Unleashed object.")
 	);
 
 	function extraStatics() {
@@ -63,7 +63,7 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 					}
 				}
 				else { // uObject can not be added because the unique field value is missing
-					return $this->notifyError('UNIQUE_FIELD_MISSING');
+					return $this->notifyError('SS_FIELD_MISSING', $ssField);
 				}
 				$fields[$uField] = $this->owner->$ssField;
 			}
@@ -110,9 +110,20 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 		user_error('You must implement this function.', E_USER_ERROR);
 	}
 
-	function notifyError($type) {
+	function notifyError($type, $field = null) {
 		$errors = Object::uninherited_static($this->class, 'errors');
 		list($subject, $body) = $errors[$type];
+		
+		if($field) {
+			$this->owner->Field = $field;
+		}
+		$data = array($this->owner);
+
+		$parser = new SSViewer_FromString($subject);
+		$subject = $subject->process($data);
+		$parser = new SSViewer_FromString($body);
+		$body = $body->process($data);
+
 		$admin = Email::getAdminEmail();
 		$email = new Email($admin, $admin, $subject, $body);
 		$email->sendPlain();

@@ -4,18 +4,18 @@ class UnleashedMemberDOD extends UnleashedObjectDOD {
 	
 	static $u_class = 'Customers';
 	static $unique_fields = array('CustomerCode', 'ID');
-	
+	/*
 	static $errors = array(
-		'NO_NAME' => array('SS Member Name Missing', "This member does not have a 'name' value set which is required in order to create a new Unleashed object.")
+		'NO_NAME' => array('SS Member #$ID Name Missing', "The member #\$ID does not have a 'name' value set which is required in order to create a new Unleashed object.")
 	);
-
+	*/
 	function synchroniseUDatabase() {
 		$sync = parent::synchroniseUDatabase();
 		$orders = $this->owner->Orders();
 		if($sync && $orders->Count()) {
 			$name = $this->owner->getName();
 			if(empty($name)) {
-				return $this->notifyError('NO_NAME');
+				return $this->notifyError('SS_FIELD_MISSING', 'Name');
 			}
 			return true;
 		}
