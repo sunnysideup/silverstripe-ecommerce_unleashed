@@ -117,4 +117,8 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 		$email = new Email($admin, $admin, $subject, $body);
 		$email->sendPlain();
 	}
+
+	function stat($name, $uncached = false) {
+		return Object::get_static(($this->class ? $this->class : get_class($this)), $name, $uncached);
+	}
 }
