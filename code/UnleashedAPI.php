@@ -22,7 +22,9 @@ class UnleashedAPI extends Object {
 	static function post($class, $uID, $values) {
 		$class .= "/$uID";
 
-		$signature = base64_encode(hash_hmac('sha256', '', self::$key, true));
+		$function = 'array2' . self::$format;
+		$values = Convert::$function($values);
+		$signature = base64_encode(hash_hmac('sha256', $values, self::$key, true));
 
 		$format = 'application/' . self::$format;
 
@@ -41,8 +43,7 @@ class UnleashedAPI extends Object {
 			curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
 			curl_setopt($curl, CURLOPT_TIMEOUT, 20);
 			curl_setopt($curl, CURLOPT_POST, true);
-			$function = 'array2' . self::$format;
-			curl_setopt($curl, CURLOPT_POSTFIELDS, Convert::$function($values));
+			curl_setopt($curl, CURLOPT_POSTFIELDS, $values);
 			$result = curl_exec($curl);
 			error_log($result); 
 			curl_close($curl);
