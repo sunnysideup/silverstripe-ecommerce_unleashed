@@ -75,7 +75,7 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 
 	function createGUID() {
 		$parts = explode(self::$guid_format_separator, self::$guid_format);
-		while(! isset($guid) || ! $uObject) {
+		while(! isset($guid) || $uObject) {
 			$guid = array();
 			foreach($parts as $part) {
 				$guid[] = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, strlen($part));

@@ -41,7 +41,8 @@ class UnleashedAPI extends Object {
 			curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
 			curl_setopt($curl, CURLOPT_TIMEOUT, 20);
 			curl_setopt($curl, CURLOPT_POST, true);
-			curl_setopt($curl, CURLOPT_POSTFIELDS, $values);
+			$function = 'array2' . self::$format;
+			curl_setopt($curl, CURLOPT_POSTFIELDS, Convert::$function($values));
 			$result = curl_exec($curl);
 			error_log($result); 
 			curl_close($curl);
