@@ -11,7 +11,7 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 	static $errors = array(
 		'U_OBJECT_DELETED' => array('Unleashed Object Not Found', "The Unleashed object had been created but can not be found anymore."),
 		'U_OBJECT_DUPLICATE' => array('Unleashed Object Already Created', "An Unleashed object with the same 'unique field' has been found.\nTherefore, this SS object can not create a new Unleashed object."),
-		'SS_FIELD_MISSING' => array('SS $ClassName #$ID $Field Missing', "The SS \$ClassName #\$ID does not have a '\$Field' value set which is required in order to create a new Unleashed object.")
+		'SS_FIELD_MISSING' => array('SS $ClassName #$ID $FieldName Missing', "The SS \$ClassName #\$ID does not have a '\$FieldName' value set which is required in order to create a new Unleashed object.")
 	);
 
 	function extraStatics() {
@@ -115,7 +115,7 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 		list($subject, $body) = $errors[$type];
 		
 		if($field) {
-			$this->owner->Field = $field;
+			$this->owner->FieldName = $field;
 		}
 		$data = array($this->owner);
 
