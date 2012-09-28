@@ -120,9 +120,9 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 		$data = array($this->owner);
 
 		$parser = new SSViewer_FromString($subject);
-		$subject = $subject->process($data);
+		$subject = $parser->process($data);
 		$parser = new SSViewer_FromString($body);
-		$body = $body->process($data);
+		$body = $parser->process($data);
 
 		$admin = Email::getAdminEmail();
 		$email = new Email($admin, $admin, $subject, $body);
