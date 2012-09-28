@@ -1,6 +1,36 @@
 <?
 
-class UnleashedMemberDOD extends DataObjectDecorator {
+class UnleashedMemberDOD extends UnleashedObjectDOD {
+	
+	static $u_class = 'Customers';
+	static $unique_fields = array('CustomerCode', 'ID');
+	
+	static $errors = array(
+		'NO_NAME' => array('SS Member Name Missing', "This member does not have a 'name' value set which is required in order to create a new Unleashed object.")
+	);
+
+	function synchroniseUDatabase() {
+		$sync = parent::synchroniseUDatabase();
+		$orders = $this->owner->Orders();
+		if($sync && $orders->Count()) {
+			$name = $this->owner->getName();
+			if(empty($name)) {
+				return $this->notifyError('NO_NAME');
+			}
+			return true;
+		}
+	}
+
+	function getUFields() {
+		return array(
+			'CustomerName' => $this->owner->getName(),
+			'Email' => $this->owner->Email,
+			'Notes' => $this->owner->Notes
+		);
+	}
+}
+
+/*class UnleashedMemberDOD extends DataObjectDecorator {
 	
 	static $uclass = 'Customers';
 
@@ -26,4 +56,4 @@ class UnleashedMemberDOD extends DataObjectDecorator {
 		}
 		UnleashedObject::post(self::$uclass, $fields, $uID);
 	}
-}
+}*/
