@@ -5,7 +5,7 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 	static $u_class;
 	static $unique_fields; // array(Unleashed Unique Field, SS Unique Field)
 
-	static $guid_format = 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX';
+	static $guid_format = 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX';
 	static $guid_format_separator = '-';
 
 	static $errors = array(

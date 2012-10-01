@@ -20,7 +20,7 @@ class UnleashedMemberDOD extends UnleashedObjectDOD {
 			return true;
 		}
 	}
-
+	
 	function getUFields() {
 		return array(
 			'CustomerName' => $this->owner->getName(),

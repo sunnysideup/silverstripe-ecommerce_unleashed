@@ -22,9 +22,7 @@ class UnleashedAPI extends Object {
 	static function post($class, $uID, $values) {
 		$class .= "/$uID";
 
-		$function = 'array2' . self::$format;
-		$values = Convert::$function($values);
-		$signature = base64_encode(hash_hmac('sha256', $values, self::$key, true));
+		$signature = base64_encode(hash_hmac('sha256', '', self::$key, true));
 
 		$format = 'application/' . self::$format;
 
@@ -34,6 +32,9 @@ class UnleashedAPI extends Object {
 			"api-auth-id: " . self::$id,
 			"api-auth-signature: $signature"
 		);
+
+		$function = 'array2' . self::$format;
+		$values = Convert::$function($values);
 
 		try { 
 			$curl = curl_init("https://api.unleashedsoftware.com/$class"); 
