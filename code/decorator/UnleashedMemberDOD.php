@@ -20,12 +20,12 @@ class UnleashedMemberDOD extends UnleashedObjectDOD {
 			return true;
 		}
 	}
-	
+
 	function getUFields() {
 		return array(
 			'CustomerName' => $this->owner->getName(),
 			'Email' => $this->owner->Email,
-			'Notes' => $this->owner->Notes
+			'Notes' => "{$this->owner->Notes}"
 		);
 	}
 }

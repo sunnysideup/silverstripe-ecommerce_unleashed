@@ -37,7 +37,7 @@ class UnleashedAPI extends Object {
 		$values = Convert::$function($values);
 
 		try { 
-			$curl = curl_init("https://api.unleashedsoftware.com/$class"); 
+			$curl = curl_init("https://api.unleashedsoftware.com/$class");
 			curl_setopt($curl, CURLINFO_HEADER_OUT, true);
 			curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 			curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0); 
