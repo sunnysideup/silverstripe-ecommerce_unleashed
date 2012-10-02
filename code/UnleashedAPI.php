@@ -35,7 +35,7 @@ class UnleashedAPI extends Object {
 
 		$function = 'array2' . self::$format;
 		$values = Convert::$function($values);
-		
+
 		try { 
 			$curl = curl_init("https://api.unleashedsoftware.com/$class");
 			curl_setopt($curl, CURLINFO_HEADER_OUT, true);
@@ -139,7 +139,7 @@ class UnleashedAPI extends Object {
 			curl_close($curl);
 			$function = self::$format . '2array';
 			$result = Convert::$function($result);
-			return $result['Items'];
+			return (is_array($result) && isset($result['Items'])) ? $result['Items'] : $result;
 		}
 		catch(Exception $e) { 
 			error_log("Unleashed Error: $e"); 
@@ -147,10 +147,7 @@ class UnleashedAPI extends Object {
 	}
 
 	static function get_by_guid($class, $guid) {
-		$uObject = self::get("$class/$guid");
-		if(is_array($uObject) && count($uObject) == 1) {
-			return $uObject[0];
-		}
+		return self::get("$class/$guid");
 	}
 
 	/*protected static function query($type, $class, $uID = null, $values = null) {
