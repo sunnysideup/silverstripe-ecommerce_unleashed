@@ -25,7 +25,7 @@ class UnleashedMemberDOD extends UnleashedObjectDOD {
 		return array(
 			'CustomerName' => $this->owner->getName(),
 			'Email' => $this->owner->Email,
-			'Notes' => "{$this->owner->Notes}"
+			'Notes' => $this->owner->Notes
 		);
 	}
 }

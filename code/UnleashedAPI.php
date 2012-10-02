@@ -35,7 +35,7 @@ class UnleashedAPI extends Object {
 
 		$function = 'array2' . self::$format;
 		$values = Convert::$function($values);
-
+		
 		try { 
 			$curl = curl_init("https://api.unleashedsoftware.com/$class");
 			curl_setopt($curl, CURLINFO_HEADER_OUT, true);
@@ -49,8 +49,7 @@ class UnleashedAPI extends Object {
 			error_log($result); 
 			curl_close($curl);
 			$function = self::$format . '2array';
-			$result = Convert::$function($result);
-			return $result['Items'];
+			return Convert::$function($result);
 		}
 		catch(Exception $e) { 
 			error_log("Unleashed Error: $e"); 
