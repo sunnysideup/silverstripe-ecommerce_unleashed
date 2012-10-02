@@ -65,7 +65,7 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 				else { // uObject can not be added because the unique field value is missing
 					return $this->notifyError('SS_FIELD_MISSING', $ssField);
 				}
-				$fields[$uField] = "{$this->owner->$ssField}";
+				$fields[$uField] = $this->owner->$ssField;
 			}
 			$this->owner->GUID = $this->createGUID();
 		}
