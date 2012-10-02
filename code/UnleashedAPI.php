@@ -100,6 +100,14 @@ class UnleashedAPI extends Object {
         }
     }
 
+    static function post_update_test() {
+    	$customers = self::get('Customers');
+    	$customer = $customers[0];
+    	$guid = $customer->Guid;
+    	$notes = rand();
+    	self::$post('Customers', $guid, array('Notes' => $notes));
+    }
+
 	static function get($class, $filters = null) {
 		$params = '';
 		if(is_array($filters)) {
