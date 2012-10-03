@@ -8,12 +8,6 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 	static $guid_format = 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX';
 	static $guid_format_separator = '-';
 
-	static $errors = array(
-		'U_OBJECT_DELETED' => array('Unleashed Object Not Found', "The Unleashed object had been created but can not be found anymore."),
-		'U_OBJECT_DUPLICATE' => array('Unleashed Object Already Created', "An Unleashed object with the same 'unique field' has been found.\nTherefore, this SS object can not create a new Unleashed object."),
-		'SS_FIELD_MISSING' => array('SS $ClassName #$ID $FieldName Missing', "The SS \$ClassName #\$ID does not have a '\$FieldName' value set which is required in order to create a new Unleashed object.")
-	);
-
 	function extraStatics() {
 		$length = strlen(self::$guid_format);
 		return array('db' => array('GUID' => "Varchar($length)"));
@@ -110,12 +104,30 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 		user_error('You must implement this function.', E_USER_ERROR);
 	}
 
+	function stat($name, $uncached = false) {
+		return Object::get_static(($this->class ? $this->class : get_class($this)), $name, $uncached);
+	}
+
+	// Error Notifications
+
+	static $errors = array(
+		'U_OBJECT_DELETED' => array('Unleashed Object Not Found', "The Unleashed object had been created but can not be found anymore."),
+		'U_OBJECT_DUPLICATE' => array('Unleashed Object Already Created', "An Unleashed object with the same 'unique field' has been found.\nTherefore, this SS object can not create a new Unleashed object."),
+		'SS_FIELD_MISSING' => array('SS $ClassName #$ID $FieldName Missing', "The SS \$ClassName #\$ID does not have a '\$FieldName' value set which is required in order to create a new Unleashed object.")
+	);
+
+	static $error_email_subject_prefix = 'SS - Unleashed Error : ';
+	static $error_email_body_prefix = 'Hi Administrator,<br/><br/>';
+	static $error_email_body_suffix = '<br/><br/>Regards';
+	static $error_email_from;
+	static $error_email_to;
+	
 	function notifyError($type, $field = null) {
 		list($subject, $body) = self::$errors[$type];
 		
-		$subject = "SS - Unleashed Error : $subject";
-		$body = "Hi Administrator,\n\n$body\n\nRegards";
-		
+		$subject = self::$error_email_subject_prefix . $subject;
+		$body = self::$error_email_body_prefix . $body . self::$error_email_body_suffix;
+
 		if($field) {
 			$this->owner->FieldName = $field;
 		}
@@ -125,12 +137,16 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 		$parser = SSViewer::fromString($body);
 		$body = $parser->process($this->owner);
 
-		$admin = Email::getAdminEmail();
-		$email = new Email($admin, $admin, $subject, $body);
-		$email->send();
-	}
+		$from = self::$error_email_from;
+		if(! $from)
+			$from = Email::getAdminEmail();
+		}
+		$to = self::$error_email_to;
+		if(! $to)
+			$to = Email::getAdminEmail();
+		}
 
-	function stat($name, $uncached = false) {
-		return Object::get_static(($this->class ? $this->class : get_class($this)), $name, $uncached);
+		$email = new Email($from, $to, $subject, $body);
+		$email->send();
 	}
 }
