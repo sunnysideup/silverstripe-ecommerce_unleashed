@@ -113,6 +113,9 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 	function notifyError($type, $field = null) {
 		list($subject, $body) = self::$errors[$type];
 		
+		$subject = "SS - Unleashed Error : $subject";
+		$body = "Hi Administrator,\n\n$body\n\nRegards";
+		
 		if($field) {
 			$this->owner->FieldName = $field;
 		}
@@ -124,7 +127,7 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 
 		$admin = Email::getAdminEmail();
 		$email = new Email($admin, $admin, $subject, $body);
-		$email->sendPlain();
+		$email->send();
 	}
 
 	function stat($name, $uncached = false) {
