@@ -78,7 +78,7 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 		while(! isset($guid) || $uObject) {
 			$guid = array();
 			foreach($parts as $part) {
-				$guid[] = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, strlen($part));
+				$guid[] = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyz'), 0, strlen($part));
 			}
 			$guid = implode(self::$guid_format_separator, $guid);
 			$uObject = UnleashedAPI::get_by_guid($this->stat('u_class'), $guid);
@@ -117,12 +117,11 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 		if($field) {
 			$this->owner->FieldName = $field;
 		}
-		$data = array($this->owner);
-
-		$parser = new SSViewer_FromString($subject);
-		$subject = $parser->process($data);
-		$parser = new SSViewer_FromString($body);
-		$body = $parser->process($data);
+		
+		$parser = SSViewer::fromString($subject);
+		$subject = $parser->process($this->owner);
+		$parser = SSViewer::fromString($body);
+		$body = $parser->process($this->owner);
 
 		$admin = Email::getAdminEmail();
 		$email = new Email($admin, $admin, $subject, $body);
