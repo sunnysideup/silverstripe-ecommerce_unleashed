@@ -112,7 +112,7 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 
 	static $errors = array(
 		'U_OBJECT_DELETED' => array('Unleashed Object Of SS $ClassName #$ID Not Found', "The Unleashed object corresponding to the SS \$ClassName #\$ID had been previously created but can not be found anymore."),
-		'U_OBJECT_DUPLICATE' => array('Unleashed Object Already Created', 'An Unleashed object with the same \'unique field\' has been found.<br/>Therefore, this SS object can not create a new Unleashed object.'),
+		'U_OBJECT_DUPLICATE' => array('Unleashed Object Of SS $ClassName #$ID With Same $FieldName Already Created', 'An Unleashed object with the same \'$FieldName\' than the SS $ClassName #$ID has been found.<br/>Therefore, a new Unleashed object can not be created for SS $ClassName #$ID.'),
 		'SS_FIELD_MISSING' => array('SS $ClassName #$ID $FieldName Missing', 'The SS $ClassName #$ID does not have a \'$FieldName\' value set which is required in order to create a new Unleashed object.')
 	);
 
