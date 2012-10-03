@@ -111,13 +111,12 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 	}
 
 	function notifyError($type, $field = null) {
-		$errors = Object::uninherited_static($this->class, 'errors');
-		list($subject, $body) = $errors[$type];
+		list($subject, $body) = self::$errors[$type];
 		
 		if($field) {
 			$this->owner->FieldName = $field;
 		}
-		
+
 		$parser = SSViewer::fromString($subject);
 		$subject = $parser->process($this->owner);
 		$parser = SSViewer::fromString($body);
