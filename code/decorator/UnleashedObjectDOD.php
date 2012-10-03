@@ -138,11 +138,11 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 		$body = $parser->process($this->owner);
 
 		$from = self::$error_email_from;
-		if(! $from)
+		if(! $from) {
 			$from = Email::getAdminEmail();
 		}
 		$to = self::$error_email_to;
-		if(! $to)
+		if(! $to) {
 			$to = Email::getAdminEmail();
 		}
 
