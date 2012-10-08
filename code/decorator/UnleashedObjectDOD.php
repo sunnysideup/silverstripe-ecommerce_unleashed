@@ -14,7 +14,7 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 		$length = strlen(self::$guid_format);
 		return array('db' => array('GUID' => "Varchar($length)"));
 	}
-	
+
 	function onAfterWrite() {
 		if($this->stat('update_after_write')) {
 			$this->checkDODSettings();
@@ -74,7 +74,7 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 			}
 		}
 		else { // The POST query failed
-			return $this->notifyError('POST', $ssField);
+			return $this->notifyError('POST');
 		}
 	}
 
