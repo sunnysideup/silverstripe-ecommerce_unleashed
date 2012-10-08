@@ -72,7 +72,7 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 		while(! isset($guid) || $uObject) {
 			$guid = array();
 			foreach($parts as $part) {
-				$guid[] = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyz'), 0, strlen($part));
+				$guid[] = substr(str_shuffle('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, strlen($part));
 			}
 			$guid = implode(self::$guid_format_separator, $guid);
 			$uObject = UnleashedAPI::get_by_guid($this->stat('u_class'), $guid);
