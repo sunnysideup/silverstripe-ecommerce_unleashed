@@ -48,7 +48,7 @@
 	// - for GET $request will only be the filters eg ?customerName=Bob
 	// - $request never includes the "?"
 	// Format agnostic method.  Pass in the required $format of "json" or "xml"
-	function get($id, $key, $endpoint, $request, $format) {
+	function getUnleashed($id, $key, $endpoint, $request, $format) {
 		$requestUrl = ""; 
 		if (!empty($request)) $requestUrl = "?$request"; 
 					
@@ -101,7 +101,7 @@
 	// - gets the data from the API and converts it to an XML object
 	function getXml($id, $key, $endpoint, $request) {
 		// GET it
-		$xml = get($id, $key, $endpoint, $request, "xml");
+		$xml = getUnleashed($id, $key, $endpoint, $request, "xml");
 		// Convert to XML object and return
 		return new SimpleXMLElement($xml);
 	}
@@ -138,7 +138,7 @@
 	// - gets the data from the API and converts it to an stdClass object	
 	function getJson($id, $key, $endpoint, $request) {
 		// GET it, decode it, return it
-		return json_decode(get($id, $key, $endpoint, $request, "json"));
+		return json_decode(getUnleashed($id, $key, $endpoint, $request, "json"));
 	}
 	
 	// POST in JSON format
