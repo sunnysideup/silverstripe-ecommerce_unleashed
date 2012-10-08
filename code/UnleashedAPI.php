@@ -32,12 +32,13 @@ class UnleashedAPI extends Object {
 			"api-auth-id: " . self::$id,
 			"api-auth-signature: $signature"
 		);
-		
+
 		$function = 'array2' . self::$format;
 		$values = Convert::$function($values);
 
 		try { 
 			$curl = curl_init("https://api.unleashedsoftware.com/$class");
+			curl_setopt($curl, CURLOPT_FRESH_CONNECT, true);
 			curl_setopt($curl, CURLINFO_HEADER_OUT, true);
 			curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 			curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0); 
@@ -55,56 +56,6 @@ class UnleashedAPI extends Object {
 			error_log("Unleashed Error: $e"); 
 		}
 	}
-
-	static function post_test() {
-		$class = 'Customers';
-		$values = array('CustomerCode' => '1', 'CustomerName' => 'Test Name');
-		$uID = 'eaotd0zs-nmoj-z86d-76yv-ue0o8793ajci';
-
-		$class .= "/$uID";
-
-		$signature = base64_encode(hash_hmac('sha256', '', self::$key, true));
-
-		$format = 'application/' . self::$format;
-
-        $headers = array(
-                "Content-Type: $format",
-                "Accept: $format",
-                "api-auth-id: " . self::$id,
-                "api-auth-signature: $signature"
-        );
-
-		$function = 'array2' . self::$format;
-        $values = Convert::$function($values);
-
-        try { 
-            $curl = curl_init("https://api.unleashedsoftware.com/$class");
-            curl_setopt($curl, CURLOPT_FRESH_CONNECT, true);
-            curl_setopt($curl, CURLINFO_HEADER_OUT, true);
-            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0); 
-            curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($curl, CURLOPT_TIMEOUT, 20);
-            curl_setopt($curl, CURLOPT_POST, 1);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $values);
-            $result = curl_exec($curl);var_dump($result);
-            error_log($result); 
-            curl_close($curl);
-            $function = self::$format . '2array';
-            $result = Convert::$function($result);
-            return $result['Items'];
-        }
-        catch(Exception $e) { 
-            error_log("Unleashed Error: $e"); 
-        }
-    }
-
-    static function post_update_test($notes) {
-    	$customers = self::get('Customers');
-    	$customer = $customers[0];
-    	$guid = $customer->Guid;
-    	self::post('Customers', $guid, array('Notes' => $notes));
-    }
 
 	static function get($class, $filters = null) {
 		$params = '';
@@ -127,8 +78,9 @@ class UnleashedAPI extends Object {
 			"api-auth-signature: $signature"
 		);
 
-		try { 
-			$curl = curl_init("https://api.unleashedsoftware.com/$class$params"); 
+		try {
+			$curl = curl_init("https://api.unleashedsoftware.com/$class$params");
+			curl_setopt($curl, CURLOPT_FRESH_CONNECT, true);
 			curl_setopt($curl, CURLINFO_HEADER_OUT, true);
 			curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 			curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0); 
@@ -149,55 +101,4 @@ class UnleashedAPI extends Object {
 	static function get_by_guid($class, $guid) {
 		return self::get("$class/$guid");
 	}
-
-	/*protected static function query($type, $class, $uID = null, $values = null) {
-		if($type != 'GET' && $type != 'POST') return;
-
-		$segment = $class;
-		if($uID) {
-			$segment .= "/$uID";
-		}
-
-		$params = '';
-		if($type == 'GET' && is_array($values)) {
-			$params = http_build_query($values);
-		}
-
-		$signature = base64_encode(hash_hmac('sha256', $params, self::$api_key, true));
-
-		if($params) {
-			$params = "?$params";
-		}
-
-		$format = 'application/' . self::$format;
-
-		$headers = array(
-			"Content-Type: $format",
-			"Accept: $format",
-			"api-auth-id: " . self::$api_id,
-			"api-auth-signature: $signature"
-		);
-
-		try { 
-			$curl = curl_init("https://api.unleashedsoftware.com/$segment$params"); 
-			curl_setopt($curl, CURLINFO_HEADER_OUT, true);
-			curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-			curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0); 
-			curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-			curl_setopt($curl, CURLOPT_TIMEOUT, 20);
-			if($type == 'POST') {
-				curl_setopt($curl, CURLOPT_POST, true);
-				curl_setopt($curl, CURLOPT_POSTFIELDS, $values);
-			}
-			$result = curl_exec($curl); 
-			error_log($result); 
-			curl_close($curl);
-			$function = self::$format . '2array';
-			$result = Convert::$function($result);
-			return $result['Items'];
-		}
-		catch(Exception $e) { 
-			error_log("Unleashed Error: $e"); 
-		}
-	}*/
 }
