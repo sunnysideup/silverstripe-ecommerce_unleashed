@@ -8,15 +8,19 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 	static $guid_format = 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX';
 	static $guid_format_separator = '-';
 
+	static $update_after_write = true;
+
 	function extraStatics() {
 		$length = strlen(self::$guid_format);
 		return array('db' => array('GUID' => "Varchar($length)"));
 	}
-
+	
 	function onAfterWrite() {
-		$this->checkDODSettings();
-		if($this->synchroniseUDatabase()) {
-			$this->updateUDatabase();
+		if($this->stat('update_after_write')) {
+			$this->checkDODSettings();
+			if($this->synchroniseUDatabase()) {
+				$this->updateUDatabase();
+			}
 		}
 	}
 
@@ -52,7 +56,7 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 			if($uField) {
 				if($this->owner->$ssField) {
 					$uObject = $this->getUObjectByUniqueField();
-					if($uObject) { // a uObject with the same ss code already exists so we can not add a new uObject with the same code
+					if($uObject) { // A uObject with the same ss code already exists so we can not add a new uObject with the same code
 						return $this->notifyError('U_OBJECT_DUPLICATE');
 					}
 				}
@@ -63,8 +67,15 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 			}
 			$this->owner->GUID = $this->createGUID();
 		}
-		UnleashedAPI::post($this->stat('u_class'), $this->owner->GUID, $fields);
-		$this->owner->write();
+		$uObject = UnleashedAPI::post($this->stat('u_class'), $this->owner->GUID, $fields);
+		if($uObject) {
+			if($this->owner->isChanged('GUID')) {
+				$this->owner->write();
+			}
+		}
+		else { // The POST query failed
+			return $this->notifyError('POST', $ssField);
+		}
 	}
 
 	function createGUID() {
@@ -113,7 +124,8 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 	static $errors = array(
 		'U_OBJECT_DELETED' => array('Unleashed Object Of SS $ClassName #$ID Not Found', "The Unleashed object corresponding to the SS \$ClassName #\$ID had been previously created but can not be found anymore."),
 		'U_OBJECT_DUPLICATE' => array('Unleashed Object Of SS $ClassName #$ID With Same $FieldName Already Created', 'An Unleashed object with the same \'$FieldName\' than the SS $ClassName #$ID has been found.<br/>Therefore, a new Unleashed object can not be created for SS $ClassName #$ID.'),
-		'SS_FIELD_MISSING' => array('SS $ClassName #$ID $FieldName Missing', 'The SS $ClassName #$ID does not have a \'$FieldName\' value set which is required in order to create a new Unleashed object.')
+		'SS_FIELD_MISSING' => array('SS $ClassName #$ID $FieldName Missing', 'The SS $ClassName #$ID does not have a \'$FieldName\' value set which is required in order to create a new Unleashed object.'),
+		'POST' => array('SS $ClassName #$ID POST Transaction Failure', 'The POST transaction to update or create the Unleashed object of the SS $ClassName #$ID failed to complete successfully.')
 	);
 
 	static $error_email_subject_prefix = 'SS - Unleashed Error : ';

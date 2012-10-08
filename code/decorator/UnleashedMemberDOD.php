@@ -5,6 +5,8 @@ class UnleashedMemberDOD extends UnleashedObjectDOD {
 	static $u_class = 'Customers';
 	static $unique_fields = array('CustomerCode', 'ID');
 	
+	static $update_after_write = false;
+	
 	function synchroniseUDatabase() {
 		$sync = parent::synchroniseUDatabase();
 		$orders = $this->owner->Orders();
