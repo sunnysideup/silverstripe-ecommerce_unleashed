@@ -65,13 +65,13 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 				}
 				$fields[$uField] = $this->owner->$ssField;
 			}
-			$this->owner->GUID = $this->createGUID();
+			$newGUID = $this->owner->GUID = $this->createGUID();
 		}
 		$uObject = UnleashedAPI::post($this->stat('u_class'), $this->owner->GUID, $fields);
 		if(! $uObject) { // The POST query failed
 			return $this->notifyError('POST');
 		}
-		else if($this->owner->isChanged('GUID')) {
+		else if(isset($newGUID)) { // DO NOT USE isChanged('GUID') function to avoid infinite loop
 			$this->owner->write();
 		}
 	}
