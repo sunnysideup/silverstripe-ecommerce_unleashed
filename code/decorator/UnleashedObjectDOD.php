@@ -47,7 +47,7 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 		$fields = $this->getUFields();
 		if($this->owner->GUID) { // uObject already created
 			$uObject = $this->getUObjectByGUID();
-			if($uObject) { // uObject has been deleted
+			if(! $uObject) { // uObject has been deleted
 				return $this->notifyError('U_OBJECT_DELETED');
 			}
 		}
