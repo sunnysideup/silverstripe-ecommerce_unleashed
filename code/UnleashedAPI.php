@@ -33,6 +33,8 @@ class UnleashedAPI extends Object {
 			"api-auth-signature: $signature"
 		);
 
+		$values = (object) $values;
+
 		$function = 'array2' . self::$format;
 		$values = Convert::$function($values);
 
