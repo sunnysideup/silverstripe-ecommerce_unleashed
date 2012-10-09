@@ -15,7 +15,25 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 		return array('db' => array('GUID' => "Varchar($length)"));
 	}
 
+	/**
+	 * Syncronisation call for @see SiteTree only when published
+	 */
+	function onAfterPublish() {
+		if(is_a($this->owner, 'SiteTree')) {
+			$this->onAfterWriteStart();
+		}
+	}
+
+	/**
+	 * Syncronisation call for @see DataObject which are not @see SiteTree
+	 */
 	function onAfterWrite() {
+		if(! is_a($this->owner, 'SiteTree')) {
+			$this->onAfterWriteStart();
+		}
+	}
+
+	protected function onAfterWriteStart() {
 		if($this->stat('update_after_write')) {
 			$this->checkDODSettings();
 			if($this->synchroniseUDatabase()) {
@@ -71,8 +89,9 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 		if(! $uObject) { // The POST query failed
 			return $this->notifyError('POST');
 		}
-		else if(isset($newGUID)) { // DO NOT USE isChanged('GUID') function to avoid infinite loop
-			$this->owner->write();
+		else if(isset($newGUID)) { // DO NOT USE isChanged('GUID') function to avoid infinite write loop calls
+			$function = is_a($this->owner, 'SiteTree') ? 'doPublish' : 'write';
+			$this->owner->$function();
 		}
 	}
 
