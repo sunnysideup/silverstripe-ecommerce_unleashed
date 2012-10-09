@@ -62,7 +62,7 @@ class UnleashedVariationDOD extends UnleashedObjectDOD {
 		$attributeValues = $this->owner->AttributeValuesSorted();
 		if($attributeValues->Count() > 0) {
 			foreach($attributeValues as $attributeValue) {
-				$attributeType = $attributeValue->ProductAttributeType();
+				$attributeType = $attributeValue->Type();
 				$attributes[] = "$attributeType->Name : $attributeValue->Value";
 			}
 			return $attributes;
