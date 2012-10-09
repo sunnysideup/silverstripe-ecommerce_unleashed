@@ -79,7 +79,7 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 					}
 				}
 				else { // uObject can not be added because the unique field value is missing
-					return $this->notifyError('SS_FIELD_MISSING', $ssField);
+					return $this->notifyError('SS_FIELDS_MISSING', $ssField);
 				}
 				$fields[$uField] = $this->owner->$ssField;
 			}
@@ -141,7 +141,7 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 	static $errors = array(
 		'U_OBJECT_DELETED' => array('Unleashed Object Of SS $ClassName #$ID Not Found', "The Unleashed object corresponding to the SS \$ClassName #\$ID had been previously created but can not be found anymore."),
 		'U_OBJECT_DUPLICATE' => array('Unleashed Object Of SS $ClassName #$ID With Same $FieldName Already Created', 'An Unleashed object with the same \'$FieldName\' than the SS $ClassName #$ID has been found.<br/>Therefore, a new Unleashed object can not be created for SS $ClassName #$ID.'),
-		'SS_FIELD_MISSING' => array('SS $ClassName #$ID $FieldName Missing', 'The SS $ClassName #$ID does not have a \'$FieldName\' value set which is required in order to create a new Unleashed object.'),
+		'SS_FIELDS_MISSING' => array('SS $ClassName #$ID $AndFieldNames Missing', 'The SS $ClassName #$ID does not have a \'$OrFieldNames\' value set which is required in order to create a new Unleashed object.'),
 		'POST' => array('SS $ClassName #$ID POST Transaction Failure', 'The POST transaction to update or create the Unleashed object of the SS $ClassName #$ID failed to complete successfully.')
 	);
 
@@ -151,14 +151,18 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 	static $error_email_from;
 	static $error_email_to;
 	
-	function notifyError($type, $field = null) {
+	function notifyError($type, $fields = null) {
 		list($subject, $body) = self::$errors[$type];
 		
 		$subject = self::$error_email_subject_prefix . $subject;
 		$body = self::$error_email_body_prefix . $body . self::$error_email_body_suffix;
 
-		if($field) {
-			$this->owner->FieldName = $field;
+		if($fields) {
+			if(! is_array($fields)) {
+				$fields = array($fields);
+			}
+			$this->owner->AndFieldNames = implode(' and ', $fields);
+			$this->owner->OrFieldNames = implode(' or ', $fields);
 		}
 
 		$parser = SSViewer::fromString($subject);

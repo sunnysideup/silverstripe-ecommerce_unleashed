@@ -13,7 +13,7 @@ class UnleashedMemberDOD extends UnleashedObjectDOD {
 		if($sync && $orders->Count()) {
 			$name = $this->owner->getName();
 			if(empty($name)) {
-				return $this->notifyError('SS_FIELD_MISSING', 'Name');
+				return $this->notifyError('SS_FIELDS_MISSING', 'Name');
 			}
 			return true;
 		}
