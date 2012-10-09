@@ -141,7 +141,7 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 	static $errors = array(
 		'U_OBJECT_DELETED' => array('Unleashed Object Of SS $ClassName #$ID Not Found', "The Unleashed object corresponding to the SS \$ClassName #\$ID had been previously created but can not be found anymore."),
 		'U_OBJECT_DUPLICATE' => array('Unleashed Object Of SS $ClassName #$ID With Same $FieldName Already Created', 'An Unleashed object with the same \'$FieldName\' than the SS $ClassName #$ID has been found.<br/>Therefore, a new Unleashed object can not be created for SS $ClassName #$ID.'),
-		'SS_FIELDS_MISSING' => array('SS $ClassName #$ID $AndFieldNames Missing', 'The SS $ClassName #$ID does not have a \'$OrFieldNames\' value set which is required in order to create a new Unleashed object.'),
+		'SS_FIELDS_MISSING' => array('SS $ClassName #$ID $AndFieldNames Missing', 'The SS $ClassName #$ID does not have a $OrFieldNames value set which is required in order to create a new Unleashed object.'),
 		'POST' => array('SS $ClassName #$ID POST Transaction Failure', 'The POST transaction to update or create the Unleashed object of the SS $ClassName #$ID failed to complete successfully.')
 	);
 
@@ -162,7 +162,7 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 				$fields = array($fields);
 			}
 			$this->owner->AndFieldNames = implode(' and ', $fields);
-			$this->owner->OrFieldNames = implode(' or ', $fields);
+			$this->owner->OrFieldNames = "'" . implode("' or '", $fields) . "'";
 		}
 
 		$parser = SSViewer::fromString($subject);
