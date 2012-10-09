@@ -2,8 +2,8 @@
 
 class UnleashedVariationDOD extends UnleashedObjectDOD {
 	
-	static $u_class = UnleashedProductDOD::$u_class;
-	static $unique_fields = UnleashedProductDOD::$unique_fields;
+	static $u_class = 'Products';
+	static $unique_fields = array('ProductCode', 'InternalItemID');
 
 	function synchroniseUDatabase() {
 		$sync = parent::synchroniseUDatabase();
