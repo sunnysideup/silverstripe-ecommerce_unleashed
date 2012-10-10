@@ -9,7 +9,7 @@ class UnleashedMemberDOD extends UnleashedObjectDOD {
 	
 	function synchroniseUDatabase() {
 		$sync = parent::synchroniseUDatabase();
-		$orders = DataObject::get('Order', "MemberID = {$this->owner->ID}"); // $this->owner->Orders() does not work
+		$orders = DataObject::get('Order', "MemberID = {$this->owner->ID}"); // $this->owner->Orders() does not work. Has EcommerceRole been added properly ?
 		if($sync && $orders) {
 			$name = $this->owner->getName();
 			if(empty($name)) {

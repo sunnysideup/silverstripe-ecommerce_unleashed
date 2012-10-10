@@ -26,8 +26,8 @@ class UnleashedOrderDOD extends UnleashedObjectDOD {
 				return $this->notifyError('SS_FIELDS_MISSING', 'Member');
 			}
 
-			$currency = $this->owner->CurrencyUsed();
-			if(! $currency->exists() || empty($currency->Code)) {
+			$currency = $this->getUCurrency();
+			if(empty($currency)) {
 				return $this->notifyError('SS_FIELDS_MISSING', 'Currency');
 			}
 
@@ -43,7 +43,7 @@ class UnleashedOrderDOD extends UnleashedObjectDOD {
 			'Customer' => $order->Member()->getUFields(),
 			'Comments' => $order->CustomerOrderNote,
 			//'ReceivedDate' => ,
-			'Currency' => $order->CurrencyUsed()->Code,
+			'Currency' => $this->getUCurrency(),
 			'DiscountRate' => 0,
 			// 'Tax' => ,
 			// 'TaxRate' => ,
@@ -66,5 +66,13 @@ class UnleashedOrderDOD extends UnleashedObjectDOD {
 			$fields['DeliveryPostCode'] = $address->{"{$prefix}PostalCode"};
 		}
 		return $fields;
+	}
+
+	function getUCurrency() {
+		$currency = $this->owner->CurrencyUsed();
+		if($currency->exists() && ! empty($currency->Code)) {
+			return $currency->Code;
+		}
+		return Payment::site_currency();
 	}
 }
