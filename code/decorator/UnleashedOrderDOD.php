@@ -6,7 +6,7 @@ class UnleashedOrderDOD extends UnleashedObjectDOD {
 	static $unique_fields = array('OrderNumber', 'ID');
 
 	static $update_after_write = false;
-	
+
 	function synchroniseUDatabase() {
 		$sync = parent::synchroniseUDatabase();
 		if($sync) {

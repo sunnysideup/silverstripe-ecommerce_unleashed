@@ -9,8 +9,8 @@ class UnleashedMemberDOD extends UnleashedObjectDOD {
 	
 	function synchroniseUDatabase() {
 		$sync = parent::synchroniseUDatabase();
-		$orders = $this->owner->Orders();
-		if($sync && $orders->Count()) {
+		$orders = DataObject::get('Order', "MemberID = {$this->owner->ID}"); // $this->owner->Orders() does not work
+		if($sync && $orders) {
 			$name = $this->owner->getName();
 			if(empty($name)) {
 				return $this->notifyError('SS_FIELDS_MISSING', 'Name');
