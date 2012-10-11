@@ -528,8 +528,7 @@
 		$guid = NewGuid();
 		echo "New GUID = $guid";
 		echo "<br />";
-		 
-		$date = date('Y-m-d');
+		
 		$taxRate = 0.15;
 		$taxCode = "G.S.T.";
 
@@ -540,18 +539,18 @@
 		// use simple xml, not stdClass
 		$sale->Guid = "$guid";
 		$sale->OrderNumber = substr($guid,0,15);
-		$sale->RequiredDate = $date;
+		$sale->OrderStatus = 'Completed';
+		$sale->Customer->CustomerCode = 6;
 		
-		//$sale->Supplier->SupplierCode = "AUR001";
 		$sale->Currency->CurrencyCode = "NZD";
 		$sale->Warehouse->WarehouseCode = "W1";
 		$sale->Tax->TaxCode = $taxCode;
-		/*
-		$lines = $purchase->addChild('PurchaseOrderLines');
-		addPurchaseLineXml($lines, 1, 'ANIMAL', 5, 10, $taxRate);
-		addPurchaseLineXml($lines, 2, 'BISCUIT', 10, 2, $taxRate);
-		addPurchaseLineXml($lines, 3, 'CANDY', 1, 25, $taxRate);
-		*/		
+		
+		$lines = $sale->addChild('SalesOrderLines');
+		addSaleInvoiceLineXml($lines, 1, 'ANIMAL', 5, 10, $taxRate);
+		addSaleInvoiceLineXml($lines, 2, 'BISCUIT', 10, 2, $taxRate);
+		addSaleInvoiceLineXml($lines, 3, 'CANDY', 1, 25, $taxRate);
+		
 		$sale->SubTotal = 95.00;
 		$sale->TaxTotal = 14.25;
 		$sale->Total = 109.25;
@@ -570,6 +569,22 @@
 		echo "Output data:" . "<br />"; 
 		echo htmlentities($xmlPost->asXML()); 
 				
+	}
+
+	function addSaleInvoiceLineXml($lines, $lineNumber, $productCode, $qty, $price, $taxRate) {
+	
+		$line = $lines->addChild('SalesInvoiceLine');
+		$line->addChild('LineNumber', $lineNumber);
+		$line->addChild('Guid', NewGuid());
+		$product = $line->addChild('Product');
+		$product->addChild('ProductCode', $productCode);
+		$line->addChild('OrderQuantity', $qty);
+		$line->addChild('UnitPrice', $price);
+		$line->addChild('LineTotal', $qty * $price);		
+		$line->addChild('LineTax', ($qty * $price * $taxRate) );		
+		$tax =$product->addChild('Tax');
+		$tax->addChild('TaxRate', $taxRate);	
+		
 	}
 	
 	testGetCustomers();
