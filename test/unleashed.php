@@ -2,9 +2,9 @@
 
 	// configuration data
 	// must use your own id and key with no extra whitespace
-    $api = "https://api.unleashedsoftware.com/";
-	$apiId = "your id here";
-    $apiKey = "your key here";
+	$api = 'https://api.unleashedsoftware.com/';
+	$apiId = 'your id here';
+	$apiKey = 'your key here';
 	
     	
 	// Get the request signature:
