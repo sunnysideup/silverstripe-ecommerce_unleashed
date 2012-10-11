@@ -187,6 +187,16 @@
 		else
 			return postJson($apiId, $apiKey, "PurchaseOrders", $purchase->Guid, $purchase);	
 	}
+
+	// Example method: POST a sale invoice in xml or json	
+	function postSaleInvoice($sale,$format) {
+		global $apiId, $apiKey;
+						
+		if ($format == "xml") 
+			return postXml($apiId, $apiKey, "SalesInvoices", $sale->Guid, $sale);	
+		else
+			return postJson($apiId, $apiKey, "SalesInvoices", $sale->Guid, $sale);	
+	}
 	
 	// Generate a new guid for use as the id when POSTing new items
 	// - there should be a better / official way to do this in PHP
@@ -508,6 +518,59 @@
 		$tax->addChild('TaxRate', $taxRate);	
 		
 	}
+
+	function testPostNewSaleInvoiceXml() {
+	
+		echo "Starting test: testPostNewSaleInvoiceXml" . "<br />";
+						
+		echo "-------------------------------------------------------------------------------------<br />";
+		echo "POST new sale invoice in XML format:" . "<br />";
+		$guid = NewGuid();
+		echo "New GUID = $guid";
+		echo "<br />";
+		 
+		$date = date('Y-m-d');
+		$taxRate = 0.15;
+		$taxCode = "G.S.T.";
+
+		// creating an xml object in PHP:
+		$sale = new simpleXMLElement('<SalesInvoice />'); 
+		
+		// set all the properties of the purchase
+		// use simple xml, not stdClass
+		$sale->Guid = "$guid";
+		$sale->OrderNumber = substr($guid,0,15);
+		$sale->RequiredDate = $date;
+		
+		//$sale->Supplier->SupplierCode = "AUR001";
+		$sale->Currency->CurrencyCode = "NZD";
+		$sale->Warehouse->WarehouseCode = "W1";
+		$sale->Tax->TaxCode = $taxCode;
+		/*
+		$lines = $purchase->addChild('PurchaseOrderLines');
+		addPurchaseLineXml($lines, 1, 'ANIMAL', 5, 10, $taxRate);
+		addPurchaseLineXml($lines, 2, 'BISCUIT', 10, 2, $taxRate);
+		addPurchaseLineXml($lines, 3, 'CANDY', 1, 25, $taxRate);
+		*/		
+		$sale->SubTotal = 95.00;
+		$sale->TaxTotal = 14.25;
+		$sale->Total = 109.25;
+		
+		$sale->Comments = "Sale invoice $guid added via xml POST";
+		
+		echo "Input data:" . "<br />"; 
+		echo htmlentities($sale->asXML()); 
+		echo "<br />"; 
+		echo "Input id:" . "<br />"; 
+		echo $sale->Guid; 
+		echo "<br />"; 
+		echo "<br />"; 
+		
+		$xmlPost = postSaleInvoice($sale, "xml", $sale->Guid); 
+		echo "Output data:" . "<br />"; 
+		echo htmlentities($xmlPost->asXML()); 
+				
+	}
 	
 	testGetCustomers();
 	testGetCustomersByName();
@@ -516,5 +579,6 @@
 	// testPostNewPurchase();	 // not finished yet
 	testPostNewCustomerXml();
 	testPostNewPurchaseXml();
-	
+	testPostNewSaleInvoiceXml();
+
 ?>
