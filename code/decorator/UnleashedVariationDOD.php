@@ -1,6 +1,8 @@
 <?
+
 /**
- * Update notify error to deal with more than 1 field missing
+ * @todo Fix the problem where the values come from the cached object instead of the values from the DB because there is an error
+ *       occuring when you enter a more than 30 characters long Internal Item ID.
  */
 class UnleashedVariationDOD extends UnleashedObjectDOD {
 	

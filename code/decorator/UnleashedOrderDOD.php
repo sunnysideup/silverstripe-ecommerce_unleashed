@@ -1,11 +1,37 @@
 <?
 
+/**
+ * Customer is required (You can specify only the GUID or CustomerCode and the Customer has to already exist)
+ * DiscountRate is not required
+ * Tax is required
+ * SalesOrderLines is required (SubTotal has to match the sum LineTotal of the order lines and vice versa)
+ * If TaxTotal is specified, it has to match the sum of LineTax of order lines and vice versa
+ * If Total is specified, it has to match the sum of SubTotal + TaxTotal and vice versa
+ * --- SalesInvoiceLines ---
+ * You can create new products by just entering a product code (it'll auto save the default purchase price as line Unit price and set GUID to 00000000-0000-0000-0000-000000000000)
+ * Can you specifiy the details of all new product here ?
+ * GUID is optional
+ * Product is required, can not be null and can be identified by productCode or GUID just like Customer
+ * DueDate is not required
+ * DiscountRate is not required
+ * OrderQuantity, UnitPrice and LineTotal have to match
+ * LineTax is required if you have TaxTotal field in order
+ * BC fields are not required
+ * Note : POST order with XML : JSON does not work
+ */
 class UnleashedOrderDOD extends UnleashedObjectDOD {
 	
 	static $u_class = 'SalesInvoices';
 	static $unique_fields = array('OrderNumber', 'ID');
 
 	static $update_after_write = false;
+
+	protected function onAfterWriteStart() {
+		$format = UnleashedAPI::$format;
+		UnleashedAPI::set_format('xml');
+		parent::onAfterWriteStart();
+		UnleashedAPI::set_format($format);
+	}
 
 	function synchroniseUDatabase() {
 		$sync = parent::synchroniseUDatabase();
@@ -44,7 +70,7 @@ class UnleashedOrderDOD extends UnleashedObjectDOD {
 			'Comments' => $order->CustomerOrderNote,
 			//'ReceivedDate' => ,
 			'Currency' => $this->getUCurrency(),
-			'DiscountRate' => 0,
+			//'DiscountRate',
 			// 'Tax' => ,
 			// 'TaxRate' => ,
 			'SubTotal' => $order->SubTotal(),

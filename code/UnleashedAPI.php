@@ -14,13 +14,13 @@ class UnleashedAPI extends Object {
 	static $allowed_formats = array('json', 'xml');
 
 	static function set_format($format) {
-		if(in_array($format, self::$allowed_formats) && method_exists('Convert', "{$format}2array")) {
+		if(in_array($format, self::$allowed_formats) && (method_exists('Convert', "{$format}2array") || method_exists('UnleashedAPI', "{$format}2array")) {
 			self::$format = $format;
 		}
 	}
 
 	static function post($class, $uID, $values) {
-		$xmlClass = substr($class, -1);
+		$xmlClass = substr($class, 0, -1);
 
 		$class .= "/$uID";
 
@@ -34,6 +34,8 @@ class UnleashedAPI extends Object {
 			"api-auth-id: " . self::$id,
 			"api-auth-signature: $signature"
 		);
+
+		$values['Guid'] = $uID;
 
 		$function = 'array2' . self::$format;
 		$convertClass = method_exists('UnleashedAPI', $function) ? 'UnleashedAPI' : 'Convert';
