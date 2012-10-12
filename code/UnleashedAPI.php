@@ -34,7 +34,8 @@ class UnleashedAPI extends Object {
 		);
 
 		$function = 'array2' . self::$format;
-		$values = Convert::$function($values);
+		$convertClass = method_exists($this, $function) ? $this->class : 'Convert';
+		$values = $convertClass::$function($values);
 
 		try { 
 			$curl = curl_init("https://api.unleashedsoftware.com/$class");
@@ -100,5 +101,40 @@ class UnleashedAPI extends Object {
 
 	static function get_by_guid($class, $guid) {
 		return self::get("$class/$guid");
+	}
+
+	static function array2xml($name, $array) {
+		$xml = new SimpleXMLElement("<$name/>");
+		self::array2xmlRecursive($xml, $array);
+		
+		$xml = $xml->asXML();
+
+		// must remove the <xml version="1.0"> node if present, the API does not want it
+		$pos = strpos($xml, '<?xml version="1.0"?>');
+		if($pos !== false) {
+			$xml = str_replace('<?xml version="1.0"?>', '', $xml);
+		}
+		
+		// if the data does not have the correct xml namespace (xmlns) then add it
+		$pos = strpos($xml, 'xmlns="http://api.unleashedsoftware.com/version/1"');
+		if($pos === false) {
+			// there should be a better way than this
+			// using preg_replace with count = 1 will only replace the first occurance
+			$xml = preg_replace('/>/i', ' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://api.unleashedsoftware.com/version/1">', $xml, 1);
+		}
+
+		return $xml;
+	}
+
+	static function array2xmlRecursive(&$pointer, $array) {
+		foreach($array as $index => $value) {
+			if(is_array($value)) {
+				$child = $pointer->addChild($index);
+				self::array2xmlRecursive($child, $value);
+			}
+			else {
+				$pointer->$index = $value;
+			}
+		}
 	}
 }
