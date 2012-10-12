@@ -20,6 +20,8 @@ class UnleashedAPI extends Object {
 	}
 
 	static function post($class, $uID, $values) {
+		$xmlClass = substr($class, -1);
+
 		$class .= "/$uID";
 
 		$signature = base64_encode(hash_hmac('sha256', '', self::$key, true));
@@ -34,8 +36,8 @@ class UnleashedAPI extends Object {
 		);
 
 		$function = 'array2' . self::$format;
-		$convertClass = method_exists($this, $function) ? $this->class : 'Convert';
-		$values = $convertClass::$function($values);
+		$convertClass = method_exists('UnleashedAPI', $function) ? 'UnleashedAPI' : 'Convert';
+		$values = $convertClass::$function($values, $xmlClass);
 
 		try { 
 			$curl = curl_init("https://api.unleashedsoftware.com/$class");
@@ -103,7 +105,7 @@ class UnleashedAPI extends Object {
 		return self::get("$class/$guid");
 	}
 
-	static function array2xml($name, $array) {
+	static function array2xml($array, $name) {
 		$xml = new SimpleXMLElement("<$name/>");
 		self::array2xmlRecursive($xml, $array);
 		
