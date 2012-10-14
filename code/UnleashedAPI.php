@@ -10,8 +10,8 @@ class UnleashedAPI extends Object {
 		self::$key = $key;
 	}
 
-	static $format = 'json';
-	static $allowed_formats = array('json', 'xml');
+	protected static $format = 'json';
+	protected static $allowed_formats = array('json', 'xml');
 
 	static function set_format($format) {
 		if(in_array($format, self::$allowed_formats)) {
@@ -94,11 +94,19 @@ class UnleashedAPI extends Object {
 			curl_close($curl);
 			$function = self::$format . '2array';
 			$result = Convert::$function($result);
-			if(is_array($result) && isset($result['Items'])) {
-				$result = $result['Items'];
-				if(self::$format == 'json') {
+			if(self::$format == 'json') {
+				if(is_array($result) && isset($result['Items'])) {
+					$result = $result['Items'];
 					foreach($result as $index => $object) {
 						$result[$index] = get_object_vars($object);
+					}
+				}
+			}
+			else if(self::$format == 'xml') { // $result is always an array
+				if(count($result) == 1) {
+					$result = array_pop($result);
+					if(is_string($result)) { // No result
+						$result = false;
 					}
 				}
 			}
