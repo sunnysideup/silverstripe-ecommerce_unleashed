@@ -91,7 +91,13 @@ class UnleashedAPI extends Object {
 			curl_close($curl);
 			$function = self::$format . '2array';
 			$result = Convert::$function($result);
-			return (is_array($result) && isset($result['Items'])) ? $result['Items'] : $result;
+			if(is_array($result) && isset($result['Items'])) {
+				$result = $result['Items'];
+				foreach($result as $index => $object) {
+					$result[$index] = Convert::$function($object);
+				}
+			}
+			return $result;
 		}
 		catch(Exception $e) { 
 			error_log("Unleashed Error: $e"); 
