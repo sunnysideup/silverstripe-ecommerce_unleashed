@@ -57,6 +57,9 @@ class UnleashedAPI extends Object {
 		}
 	}
 
+	/**
+	 * Returns an array or an array of arrays or false 
+	 */
 	static function get($class, $filters = null) {
 		$params = '';
 		if(is_array($filters)) {
@@ -93,8 +96,10 @@ class UnleashedAPI extends Object {
 			$result = Convert::$function($result);
 			if(is_array($result) && isset($result['Items'])) {
 				$result = $result['Items'];
-				foreach($result as $index => $object) {
-					$result[$index] = Convert::$function($object);
+				if(self::$format == 'json') {
+					foreach($result as $index => $object) {
+						$result[$index] = get_object_vars($object);
+					}
 				}
 			}
 			return $result;
