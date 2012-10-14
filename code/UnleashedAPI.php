@@ -14,16 +14,12 @@ class UnleashedAPI extends Object {
 	static $allowed_formats = array('json', 'xml');
 
 	static function set_format($format) {
-		if(in_array($format, self::$allowed_formats) && (method_exists('Convert', "{$format}2array") || method_exists('UnleashedAPI', "{$format}2array")) {
+		if(in_array($format, self::$allowed_formats)) {
 			self::$format = $format;
 		}
 	}
 
 	static function post($class, $uID, $values) {
-		$xmlClass = substr($class, 0, -1);
-
-		$class .= "/$uID";
-
 		$signature = base64_encode(hash_hmac('sha256', '', self::$key, true));
 
 		$format = 'application/' . self::$format;
@@ -38,11 +34,10 @@ class UnleashedAPI extends Object {
 		$values['Guid'] = $uID;
 
 		$function = 'array2' . self::$format;
-		$convertClass = method_exists('UnleashedAPI', $function) ? 'UnleashedAPI' : 'Convert';
-		$values = $convertClass::$function($values, $xmlClass);
+		$values = self::$format == 'xml' ? self::$function($values, substr($class, 0, -1)) : Convert::$function($values);
 
 		try { 
-			$curl = curl_init("https://api.unleashedsoftware.com/$class");
+			$curl = curl_init("https://api.unleashedsoftware.com/$class/$uID");
 			curl_setopt($curl, CURLOPT_FRESH_CONNECT, true);
 			curl_setopt($curl, CURLINFO_HEADER_OUT, true);
 			curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
