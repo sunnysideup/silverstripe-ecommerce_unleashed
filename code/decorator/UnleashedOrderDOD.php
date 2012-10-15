@@ -27,7 +27,7 @@ class UnleashedOrderDOD extends UnleashedObjectDOD {
 	static $update_after_write = false;
 
 	protected function onAfterWriteStart() {
-		$format = UnleashedAPI::$format;
+		$format = UnleashedAPI::get_format();
 		UnleashedAPI::set_format('xml');
 		parent::onAfterWriteStart();
 		UnleashedAPI::set_format($format);

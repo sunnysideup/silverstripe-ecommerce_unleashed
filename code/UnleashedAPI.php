@@ -19,6 +19,8 @@ class UnleashedAPI extends Object {
 		}
 	}
 
+	static function get_format() {return self::$format;}
+
 	static function post($class, $uID, $values) {
 		$signature = base64_encode(hash_hmac('sha256', '', self::$key, true));
 
