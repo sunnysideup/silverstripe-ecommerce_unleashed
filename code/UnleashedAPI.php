@@ -105,7 +105,7 @@ class UnleashedAPI extends Object {
 			else if(self::$format == 'xml') { // $result is always an array of 1
 				$result = array_pop($result);
 				if(is_array($result)) { // There are results
-					if(strpos($class, '/') !== false && ! isset($result[0])) { // Fix : This was not a search by GUID but only 1 object has been returned so it needs to be an array of array
+					if(strpos($class, '/') === false && ! isset($result[0])) { // Fix : This was not a search by GUID but only 1 object has been returned so it needs to be an array of array
 						$result = array($result);
 					}
 				}
