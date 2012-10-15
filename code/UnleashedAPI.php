@@ -23,8 +23,7 @@ class UnleashedAPI extends Object {
 
 	/**
 	 * IMPORTANT : Do not use the return values (Test post already created Product and it returns ProductCode = NULL)
-	 * Update Product XML : InternalServerError
-
+	 * Add/Update Product XML : InternalServerError
 	 */
 	static function post($class, $uID, $values) {
 		$signature = base64_encode(hash_hmac('sha256', '', self::$key, true));
@@ -57,7 +56,8 @@ class UnleashedAPI extends Object {
 			error_log($result); 
 			curl_close($curl);
 			$function = self::$format . '2array';
-			return Convert::$function($result);
+			$result = Convert::$function($result);
+			return is_string($result) ? false : $result;
 		}
 		catch(Exception $e) { 
 			error_log("Unleashed Error: $e"); 
