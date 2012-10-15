@@ -23,14 +23,13 @@ class UnleashedOrderDOD extends UnleashedObjectDOD {
 	
 	static $u_class = 'SalesInvoices';
 	static $unique_fields = array('OrderNumber', 'ID');
-
-	static $update_after_write = false;
+	
+	static $post_format = 'xml';
 
 	protected function onAfterWriteStart() {
-		$format = UnleashedAPI::get_format();
-		UnleashedAPI::set_format('xml');
-		parent::onAfterWriteStart();
-		UnleashedAPI::set_format($format);
+		if($this->owner->IsSubmitted()) {
+			parent::onAfterWriteStart();
+		}
 	}
 
 	function synchroniseUDatabase() {

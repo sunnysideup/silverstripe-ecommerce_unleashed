@@ -9,6 +9,7 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 	static $guid_format_separator = '-';
 
 	static $update_after_write = true;
+	static $post_format = 'json';
 
 	function extraStatics() {
 		$length = strlen(self::$guid_format);
@@ -85,7 +86,7 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 			}
 			$newGUID = $this->owner->GUID = $this->createGUID();
 		}
-		$uObject = UnleashedAPI::post($this->stat('u_class'), $this->owner->GUID, $fields);
+		$uObject = UnleashedAPI::post($this->stat('u_class'), $this->owner->GUID, $fields, $this->stat('post_format'));
 		if(! $uObject) { // The POST query failed
 			return $this->notifyError('POST');
 		}

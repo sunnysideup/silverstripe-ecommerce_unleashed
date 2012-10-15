@@ -25,22 +25,26 @@ class UnleashedAPI extends Object {
 	 * IMPORTANT : Do not use the return values (Test post already created Product and it returns ProductCode = NULL)
 	 * Add/Update Product XML : InternalServerError
 	 */
-	static function post($class, $uID, $values) {
+	static function post($class, $uID, $values, $format = null) {
 		$signature = base64_encode(hash_hmac('sha256', '', self::$key, true));
 
-		$format = 'application/' . self::$format;
+		if(! $format) {
+			$format = self::$format;
+		}
+
+		$headerFormat = "application/$format";
 
 		$headers = array(
-			"Content-Type: $format",
-			"Accept: $format",
+			"Content-Type: $headerFormat",
+			"Accept: $headerFormat",
 			"api-auth-id: " . self::$id,
 			"api-auth-signature: $signature"
 		);
 
 		$values['Guid'] = $uID;
 
-		$function = 'array2' . self::$format;
-		$values = self::$format == 'xml' ? self::$function($values, substr($class, 0, -1)) : Convert::$function($values);
+		$function = "array2$format";
+		$values = $format == 'xml' ? self::$function($values, substr($class, 0, -1)) : Convert::$function($values);
 
 		try { 
 			$curl = curl_init("https://api.unleashedsoftware.com/$class/$uID");
@@ -55,7 +59,7 @@ class UnleashedAPI extends Object {
 			$result = curl_exec($curl);
 			error_log($result); 
 			curl_close($curl);
-			$function = self::$format . '2array';
+			$function = "{$format}2array";
 			$result = Convert::$function($result);
 			return is_string($result) ? false : $result;
 		}
