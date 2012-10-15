@@ -21,6 +21,11 @@ class UnleashedAPI extends Object {
 
 	static function get_format() {return self::$format;}
 
+	/**
+	 * IMPORTANT : Do not use the return values (Test post already created Product and it returns ProductCode = NULL)
+	 * Update Product XML : InternalServerError
+
+	 */
 	static function post($class, $uID, $values) {
 		$signature = base64_encode(hash_hmac('sha256', '', self::$key, true));
 
@@ -104,8 +109,11 @@ class UnleashedAPI extends Object {
 					}
 				}
 			}
-			else if(self::$format == 'xml') { // $result is always an array
-				if(count($result) == 1) { // List of objects or no result
+			else if(self::$format == 'xml') { // $result is an array or empty string
+				if($result == '') {
+					$result = false;
+				}
+				else if(count($result) == 1) { // List of objects or no result
 					$result = array_pop($result);
 					if(is_array($result)) { // There are results
 						if(! isset($result[0])) {

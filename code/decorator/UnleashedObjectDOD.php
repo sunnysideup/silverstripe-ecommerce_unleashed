@@ -121,9 +121,11 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 	function getUObjectByUniqueField() {
 		list($uField, $ssField) = $this->stat('unique_fields');
 		$uObjects = UnleashedAPI::get($this->stat('u_class'), array(lcfirst($uField) => $this->owner->$ssField));
-		foreach($uObjects as $uObject) {
-			if($uObject[$uField] == $this->owner->$ssField) {
-				return $uObject;
+		if($uObjects) {
+			foreach($uObjects as $uObject) {
+				if($uObject[$uField] == $this->owner->$ssField) {
+					return $uObject;
+				}
 			}
 		}
 	}
