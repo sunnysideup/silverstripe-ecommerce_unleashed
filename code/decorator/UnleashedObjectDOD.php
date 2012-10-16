@@ -96,8 +96,9 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 		}
 		else if(isset($newGUID)) { // DO NOT USE isChanged('GUID') function to avoid infinite write loop calls
 			$function = is_a($this->owner, 'SiteTree') ? 'doPublish' : 'write';
-			return $this->owner->$function();
+			$this->owner->$function();
 		}
+		return true;
 	}
 
 	function createGUID() {
