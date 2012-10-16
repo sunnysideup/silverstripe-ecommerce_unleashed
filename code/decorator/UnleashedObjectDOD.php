@@ -77,7 +77,7 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 				if($this->owner->$ssField) {
 					$uObject = $this->getUObjectByUniqueField();
 					if($uObject) { // A uObject with the same ss code already exists so we can not add a new uObject with the same code
-						return $this->notifyError('U_OBJECT_DUPLICATE');
+						return $this->notifyError('U_OBJECT_DUPLICATE', $ssField);
 					}
 				}
 				else { // uObject can not be added because the unique field value is missing
