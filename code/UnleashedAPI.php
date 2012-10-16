@@ -22,7 +22,7 @@ class UnleashedAPI extends Object {
 	static function get_format() {return self::$format;}
 
 	/**
-	 * IMPORTANT : Do not use the return values (Test post already created Product and it returns ProductCode = NULL)
+	 * IMPORTANT : Do not use the return values (Test post already created Product and it returns ProductCode = NULL), (Test post new order and it returns GUID = null for the Customer)
 	 * Add/Update Product XML : InternalServerError
 	 */
 	static function post($class, $uID, $values, $format = null) {
@@ -41,7 +41,9 @@ class UnleashedAPI extends Object {
 			"api-auth-signature: $signature"
 		);
 
-		$values['Guid'] = $uID;
+		if($format == 'xml') {
+			$values['Guid'] = $uID;
+		}
 
 		$function = "array2$format";
 		$values = $format == 'xml' ? self::$function($values, substr($class, 0, -1)) : Convert::$function($values);
