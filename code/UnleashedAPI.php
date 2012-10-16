@@ -40,11 +40,7 @@ class UnleashedAPI extends Object {
 			"api-auth-id: " . self::$id,
 			"api-auth-signature: $signature"
 		);
-
-		if($format == 'xml') {
-			$values['Guid'] = $uID;
-		}
-
+		
 		$function = "array2$format";
 		$values = $format == 'xml' ? self::$function($values, substr($class, 0, -1)) : Convert::$function($values);
 
@@ -63,7 +59,7 @@ class UnleashedAPI extends Object {
 			curl_close($curl);
 			$function = "{$format}2array";
 			$result = Convert::$function($result);
-			return is_string($result) ? false : $result;
+			return is_string($result) || ($format == 'xml' && isset($result['ValidationError'])) ? false : $result;
 		}
 		catch(Exception $e) { 
 			error_log("Unleashed Error: $e"); 
