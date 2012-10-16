@@ -18,12 +18,14 @@
  * LineTax is required if you have TaxTotal field in order
  * BC fields are not required
  * Note : POST order with XML : JSON does not work
+ *
+ * OrderStatus is always required Add/Update
  */
 class UnleashedOrderDOD extends UnleashedObjectDOD {
 	
 	static $u_class = 'SalesInvoices';
 	static $unique_fields = array('OrderNumber', 'ID');
-	
+
 	static $post_format = 'xml';
 
 	protected function onAfterWriteStart() {
@@ -35,14 +37,17 @@ class UnleashedOrderDOD extends UnleashedObjectDOD {
 	function synchroniseUDatabase() {
 		$sync = parent::synchroniseUDatabase();
 		if($sync) {
-			$status = $this->owner->getCustomerStatus(false);
+			/*$status = $this->owner->getCustomerStatus(false);
 			if(empty($status)) {
 				return $this->notifyError('SS_FIELDS_MISSING', 'Status');
-			}
+			}*/
 
 			$member = $this->owner->Member();
 			if($member->exists()) {
 				$sync = $member->synchroniseUDatabase();
+				if($sync) {
+					$sync = $member->updateUDatabase();
+				}
 				if(! $sync) {
 					return $this->notifyError('SS_FIELDS_MISSING', 'Member Validation');
 				}
@@ -60,16 +65,24 @@ class UnleashedOrderDOD extends UnleashedObjectDOD {
 		}
 	}
 
+	/**
+	 * Code generated for XML
+     */
 	function getUFields() {
 		$order = $this->owner;
 		$fields = array(
-			'OrderDate' => $order->Created,
-			'OrderStatus' => $order->getCustomerStatus(false),
-			'Customer' => $order->Member()->getUFields(),
+			'OrderDate' => str_replace(' ', 'T', $order->Created), // XSD format
+			// QuoteExpiryDate
+			// RequiredDate
+			'OrderStatus' => 'Parked', // Whatever we enter, it's always Parked. Used to be $order->getCustomerStatus(false),
+			'Customer' => $order->Member()->getUFieldsForOrder(),
+			// CustomerRef
 			'Comments' => $order->CustomerOrderNote,
-			//'ReceivedDate' => ,
-			'Currency' => $this->getUCurrency(),
-			//'DiscountRate',
+			// Warehouse
+			// ReceivedDate
+			'Currency' => array('CurrencyCode' => $this->getUCurrency()),
+			// ExchangeRate
+			// DiscountRate
 			// 'Tax' => ,
 			// 'TaxRate' => ,
 			'SubTotal' => $order->SubTotal(),
@@ -87,7 +100,7 @@ class UnleashedOrderDOD extends UnleashedObjectDOD {
 			$fields['DeliveryStreetAddress'] = $address->{"{$prefix}Address"};
 			$fields['DeliverySuburb'] = $address->{"{$prefix}Address2"};
 			$fields['DeliveryCity'] = $address->{"{$prefix}City"};
-			$fields['DeliveryCountry'] = $address->{"{$prefix}Country"};
+			$fields['DeliveryCountry'] = $address->{"get{$prefix}FullCountryName"}();
 			$fields['DeliveryPostCode'] = $address->{"{$prefix}PostalCode"};
 		}
 		return $fields;

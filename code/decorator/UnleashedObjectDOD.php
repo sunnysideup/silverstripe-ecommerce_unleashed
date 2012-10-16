@@ -63,6 +63,7 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 	function synchroniseUDatabase() {return true;}
 
 	function updateUDatabase() {
+		$format = $this->stat('post_format');
 		$fields = $this->getUFields();
 		if($this->owner->GUID) { // uObject already created
 			$uObject = $this->getUObjectByGUID();
@@ -85,14 +86,17 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 				$fields[$uField] = $this->owner->$ssField;
 			}
 			$newGUID = $this->owner->GUID = $this->createGUID();
+			if($format == 'xml') {
+				$fields['Guid'] = $newGUID;
+			}
 		}
-		$uObject = UnleashedAPI::post($this->stat('u_class'), $this->owner->GUID, $fields, $this->stat('post_format'));
+		$uObject = UnleashedAPI::post($this->stat('u_class'), $this->owner->GUID, $fields, $format);
 		if(! $uObject) { // The POST query failed
 			return $this->notifyError('POST');
 		}
 		else if(isset($newGUID)) { // DO NOT USE isChanged('GUID') function to avoid infinite write loop calls
 			$function = is_a($this->owner, 'SiteTree') ? 'doPublish' : 'write';
-			$this->owner->$function();
+			return $this->owner->$function();
 		}
 	}
 

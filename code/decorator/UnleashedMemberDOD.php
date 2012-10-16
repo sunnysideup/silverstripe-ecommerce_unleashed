@@ -26,4 +26,8 @@ class UnleashedMemberDOD extends UnleashedObjectDOD {
 			'Notes' => $this->owner->Notes
 		);
 	}
+
+	function getUFieldsForOrder() {
+		return array('Guid' => $this->owner->GUID);
+	}
 }
