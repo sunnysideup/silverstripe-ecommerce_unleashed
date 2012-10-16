@@ -49,7 +49,7 @@ class UnleashedOrderDOD extends UnleashedObjectDOD {
 					$sync = $member->updateUDatabase();
 				}
 				if(! $sync) {
-					return $this->notifyError('SS_FIELDS_MISSING', 'Member Validation');
+					return $this->notifyError('SS_RELATION_INVALID', 'Member');
 				}
 			}
 			else {
