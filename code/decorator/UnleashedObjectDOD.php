@@ -63,42 +63,44 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 	function synchroniseUDatabase() {return true;}
 
 	function updateUDatabase() {
-		$format = $this->stat('post_format');
-		$fields = $this->getUFields();
-		if($this->owner->GUID) { // uObject already created
-			$uObject = $this->getUObjectByGUID();
-			if(! $uObject) { // uObject has been deleted
-				return $this->notifyError('U_OBJECT_DELETED');
+		$fields = $this->getUFields(); // Can return false if there is an error in the total, subtotal, taxtotal calculations
+		if($fields) {
+			$format = $this->stat('post_format');
+			if($this->owner->GUID) { // uObject already created
+				$uObject = $this->getUObjectByGUID();
+				if(! $uObject) { // uObject has been deleted
+					return $this->notifyError('U_OBJECT_DELETED');
+				}
 			}
-		}
-		else {
-			list($uField, $ssField) = $this->stat('unique_fields');
-			if($uField) {
-				if($this->owner->$ssField) {
-					$uObject = $this->getUObjectByUniqueField();
-					if($uObject) { // A uObject with the same ss code already exists so we can not add a new uObject with the same code
-						return $this->notifyError('U_OBJECT_DUPLICATE', $ssField);
+			else {
+				list($uField, $ssField) = $this->stat('unique_fields');
+				if($uField) {
+					if($this->owner->$ssField) {
+						$uObject = $this->getUObjectByUniqueField();
+						if($uObject) { // A uObject with the same ss code already exists so we can not add a new uObject with the same code
+							return $this->notifyError('U_OBJECT_DUPLICATE', $ssField);
+						}
 					}
+					else { // uObject can not be added because the unique field value is missing
+						return $this->notifyError('SS_FIELDS_MISSING', $ssField);
+					}
+					$fields[$uField] = $this->owner->$ssField;
 				}
-				else { // uObject can not be added because the unique field value is missing
-					return $this->notifyError('SS_FIELDS_MISSING', $ssField);
+				$newGUID = $this->owner->GUID = $this->createGUID();
+				if($format == 'xml') {
+					$fields['Guid'] = $newGUID;
 				}
-				$fields[$uField] = $this->owner->$ssField;
 			}
-			$newGUID = $this->owner->GUID = $this->createGUID();
-			if($format == 'xml') {
-				$fields['Guid'] = $newGUID;
+			$uObject = UnleashedAPI::post($this->stat('u_class'), $this->owner->GUID, $fields, $format);
+			if(! $uObject) { // The POST query failed
+				return $this->notifyError('POST');
 			}
+			else if(isset($newGUID)) { // DO NOT USE isChanged('GUID') function to avoid infinite write loop calls
+				$function = is_a($this->owner, 'SiteTree') ? 'doPublish' : 'write';
+				$this->owner->$function();
+			}
+			return true;
 		}
-		$uObject = UnleashedAPI::post($this->stat('u_class'), $this->owner->GUID, $fields, $format);
-		if(! $uObject) { // The POST query failed
-			return $this->notifyError('POST');
-		}
-		else if(isset($newGUID)) { // DO NOT USE isChanged('GUID') function to avoid infinite write loop calls
-			$function = is_a($this->owner, 'SiteTree') ? 'doPublish' : 'write';
-			$this->owner->$function();
-		}
-		return true;
 	}
 
 	function createGUID() {
@@ -151,7 +153,8 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 		'U_OBJECT_DUPLICATE' => array('Unleashed Object Of SS $ClassName #$ID With Same $AndFieldNames Already Created', 'An Unleashed object with the same $AndFieldNames than the SS $ClassName #$ID has been found.<br/>Therefore, a new Unleashed object can not be created for SS $ClassName #$ID.'),
 		'SS_FIELDS_MISSING' => array('SS $ClassName #$ID $AndFieldNames Missing', 'The SS $ClassName #$ID does not have a $OrFieldNames value set which is required in order to create a new Unleashed object.'),
 		'POST' => array('SS $ClassName #$ID POST Transaction Failure', 'The POST transaction to update or create the Unleashed object of the SS $ClassName #$ID failed to complete successfully.'),
-		'SS_RELATION_INVALID' => array('SS $ClassName #$ID $AndFieldNames Invalid', 'The $AndFieldNames of SS $ClassName #$ID is not valid.<br/>Therefore, a new Unleashed object can not be created for SS $ClassName #$ID.')
+		'SS_RELATION_INVALID' => array('SS $ClassName #$ID $AndFieldNames Invalid', 'The $AndFieldNames of SS $ClassName #$ID is not valid.<br/>Therefore, a new Unleashed object can not be created for SS $ClassName #$ID.'),
+		'CALCULATION_INCORRECT' => array('SS $ClassName #$ID $AndFieldNames Unleashed Recalculation(s) Incorrect', 'The recalculation(s) of $AndFieldNames of SS $ClassName #$ID do(es) not correspond to the $AndFieldNames value(s) recorded in the database.<br/>Therefore, a new Unleashed object can not be created for SS $ClassName #$ID.')
 	);
 
 	static $error_email_subject_prefix = 'SS - Unleashed Error : ';

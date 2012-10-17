@@ -123,7 +123,7 @@ class UnleashedOrderDOD extends UnleashedObjectDOD {
 			// XeroTaxCode
 			// SubTotal : Has to be equal to the sum of LineTotal of the order lines
 			// TaxTotal : Has to be equal to the sum of LineTax of the order lines
-			'Total' => $order->Total() // Has to be equal to the sum of SubTotal and Tax Total
+			// Total : Has to be equal to the sum of SubTotal and Tax Total
 			// TotalVolume
 			// TotalWeight
 			// BCSubTotal
@@ -148,6 +148,7 @@ class UnleashedOrderDOD extends UnleashedObjectDOD {
 			$fields['DeliveryCountry'] = $address->{"get{$prefix}FullCountryName"}();
 			$fields['DeliveryPostCode'] = $address->{"{$prefix}PostalCode"};
 		}
+		unset($tax);
 		if(self::$attribute_tax_class) { // We suppose it's GSTTaxModifier
 			$tax = $order->Modifiers(self::$attribute_tax_class);
 			if($tax) {
@@ -190,8 +191,17 @@ class UnleashedOrderDOD extends UnleashedObjectDOD {
 		$fields['SubTotal'] = $subTotal;
 		if(isset($tax)) {
 			$fields['TaxTotal'] = $taxTotal;
+			if($tax->CalculatedTotal != round($taxTotal, 2)) {
+				$errors[] = 'Tax';
+			}
 		}
 		$fields['Total'] = $subTotal + $taxTotal;
+		if($this->owner->Total != round($fields['Total'], 2)) {
+			$errors[] = 'Total';
+		}
+		if(isset($errors)) {
+			return $this->notifyError('CALCULATION_INCORRECT', $errors);
+		}
 		return $fields;
 	}
 
