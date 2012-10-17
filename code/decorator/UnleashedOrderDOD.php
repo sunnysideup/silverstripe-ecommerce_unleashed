@@ -73,17 +73,21 @@ class UnleashedOrderDOD extends UnleashedObjectDOD {
 
 			$attributes = $this->owner->Attributes();
 			foreach($attributes as $attribute) {
-				if($attribute->ClassName != self::$attribute_tax_class)) {
+				if($attribute->ClassName != self::$attribute_tax_class) {
 					if($attribute->CalculatedTotal != 0 || ! in_array($attribute->ClassName, self::$exclude_attribute_classes)) { // Only exclude them if CalculatedTotal equals 0
 						// Precondition : Only order items
 						$buyable = $attribute->Buyable(true);
-						if($buyable->hasExtension('UnleashedObjectDOD')) {
-							$sync = $buyable->synchroniseUDatabase();
-							if($sync) {
-								$sync = $buyable->updateUDatabase();
-							}
-							if(! $sync) {
-								return $this->notifyError('SS_RELATION_INVALID', "$buyable->ClassName #$buyable->ID");
+						$extensions = array_keys($buyable->getExtensionInstances());
+						foreach($extensions as $extension) {
+							if(is_a($extension, 'UnleashedObjectDOD')) {
+								$sync = $buyable->synchroniseUDatabase();
+								if($sync) {
+									$sync = $buyable->updateUDatabase();
+								}
+								if(! $sync) {
+									return $this->notifyError('SS_RELATION_INVALID', "$buyable->ClassName #$buyable->ID");
+								}
+								break;
 							}
 						}
 						// Todo : deal with other modifiers like delivery
