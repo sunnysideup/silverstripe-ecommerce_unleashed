@@ -155,7 +155,7 @@ class UnleashedOrderDOD extends UnleashedObjectDOD {
 				$fields['TaxTotal'] = $tax->CalculatedTotal;
 			}
 		}
-		$subTotal = 0;
+		$subTotal = $taxTotal = 0;
 		$lines = array();
 		$attributes = $this->owner->Attributes();
 		foreach($attributes as $attribute) {
@@ -177,7 +177,8 @@ class UnleashedOrderDOD extends UnleashedObjectDOD {
 								$attributeFields[$name] = $attributeFields[$name] / (1 + $tax->CurrentRate);
 							}
 						}
-						$attributeFields['LineTax'] = round($attributeFields['LineTotal'] * $tax->CurrentRate, 2);
+						$attributeFields['LineTax'] = $attributeFields['LineTotal'] * $tax->CurrentRate;
+						$taxTotal += $attributeFields['LineTax'];
 					}
 					$subTotal += $attributeFields['LineTotal'];
 					$lines[] = $attributeFields;
@@ -187,6 +188,10 @@ class UnleashedOrderDOD extends UnleashedObjectDOD {
 		}
 		$fields['SalesOrderLines']['SalesInvoiceLine'] = $lines;
 		$fields['SubTotal'] = $subTotal;
+		if(isset($tax)) {
+			$fields['TaxTotal'] = $taxTotal;
+		}
+		$fields['Total'] = $subTotal + $taxTotal;
 		return $fields;
 	}
 

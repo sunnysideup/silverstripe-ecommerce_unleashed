@@ -164,8 +164,16 @@ class UnleashedAPI extends Object {
 	static function array2xmlRecursive(&$pointer, $array) {
 		foreach($array as $index => $value) {
 			if(is_array($value)) {
-				$child = $pointer->addChild($index);
-				self::array2xmlRecursive($child, $value);
+				if(array_values($value) === $value) { // Associative Array
+					foreach($value as $subValue) {
+						$child = $pointer->addChild($index);
+						self::array2xmlRecursive($child, $subValue);
+					}
+				}
+				else {
+					$child = $pointer->addChild($index);
+					self::array2xmlRecursive($child, $value);
+				}
 			}
 			else {
 				$pointer->$index = $value;
