@@ -79,7 +79,7 @@ class UnleashedOrderDOD extends UnleashedObjectDOD {
 						$buyable = $attribute->Buyable(true);
 						$extensions = array_keys($buyable->getExtensionInstances());
 						foreach($extensions as $extension) {
-							if(is_a($extension, 'UnleashedObjectDOD')) {
+							if(is_subclass_of($extension, 'UnleashedObjectDOD')) {
 								$sync = $buyable->synchroniseUDatabase();
 								if($sync) {
 									$sync = $buyable->updateUDatabase();
