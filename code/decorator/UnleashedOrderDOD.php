@@ -29,6 +29,8 @@ class UnleashedOrderDOD extends UnleashedObjectDOD {
 	static $post_format = 'xml';
 
 	static $u_tax_guid;
+	static $attribute_tax_class;
+	static $exclude_attribute_classes = array();
 
 	protected function onAfterWriteStart() {
 		if($this->owner->IsSubmitted()) {
@@ -69,6 +71,26 @@ class UnleashedOrderDOD extends UnleashedObjectDOD {
 				return $this->notifyError('SS_FIELDS_MISSING', 'Unleashed Tax');
 			}
 
+			$attributes = $this->owner->Attributes();
+			foreach($attributes as $attribute) {
+				if($attribute->ClassName != self::$attribute_tax_class)) {
+					if($attribute->CalculatedTotal != 0 || ! in_array($attribute->ClassName, self::$exclude_attribute_classes)) { // Only exclude them if CalculatedTotal equals 0
+						// Precondition : Only order items
+						$buyable = $attribute->Buyable(true);
+						if($buyable->hasExtension('UnleashedObjectDOD')) {
+							$sync = $buyable->synchroniseUDatabase();
+							if($sync) {
+								$sync = $buyable->updateUDatabase();
+							}
+							if(! $sync) {
+								return $this->notifyError('SS_RELATION_INVALID', "$buyable->ClassName #$buyable->ID");
+							}
+						}
+						// Todo : deal with other modifiers like delivery
+					}
+				}
+			}
+
 			return true;
 		}
 	}
@@ -95,9 +117,9 @@ class UnleashedOrderDOD extends UnleashedObjectDOD {
 			'Tax' => array('Guid' => $tax['Guid']),
 			// TaxRate
 			// XeroTaxCode
-			'SubTotal' => $order->SubTotal(),
-			// TaxTotal
-			'Total' => $order->Total()
+			'SubTotal' => $order->SubTotal(), // Has to be equal to the sum of LineTotal of the order lines
+			// TaxTotal // Has to be equal to the sum of LineTax of the order lines
+			'Total' => $order->Total() // Has to be equal to the sum of SubTotal and Tax Total
 			// TotalVolume
 			// TotalWeight
 			// BCSubTotal
