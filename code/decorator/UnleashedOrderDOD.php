@@ -121,8 +121,8 @@ class UnleashedOrderDOD extends UnleashedObjectDOD {
 			'Tax' => array('Guid' => $tax['Guid']),
 			// TaxRate
 			// XeroTaxCode
-			'SubTotal' => $order->SubTotal(), // Has to be equal to the sum of LineTotal of the order lines
-			// TaxTotal // Has to be equal to the sum of LineTax of the order lines
+			// SubTotal : Has to be equal to the sum of LineTotal of the order lines
+			// TaxTotal : Has to be equal to the sum of LineTax of the order lines
 			'Total' => $order->Total() // Has to be equal to the sum of SubTotal and Tax Total
 			// TotalVolume
 			// TotalWeight
@@ -148,6 +148,44 @@ class UnleashedOrderDOD extends UnleashedObjectDOD {
 			$fields['DeliveryCountry'] = $address->{"get{$prefix}FullCountryName"}();
 			$fields['DeliveryPostCode'] = $address->{"{$prefix}PostalCode"};
 		}
+		if(self::$attribute_tax_class) { // We suppose it's GSTTaxModifier
+			$tax = $order->Modifiers(self::$attribute_tax_class);
+			if($tax) {
+				$tax = $tax->First();
+				$fields['TaxTotal'] = $tax->CalculatedTotal;
+			}
+		}
+		$subTotal = 0;
+		$fields['SalesOrderLines'] = array();
+		$attributes = $this->owner->Attributes();
+		foreach($attributes as $attribute) {
+			if($attribute->ClassName != self::$attribute_tax_class) {
+				if($attribute->CalculatedTotal != 0 || ! in_array($attribute->ClassName, self::$exclude_attribute_classes)) { // Only exclude them if CalculatedTotal equals 0
+					// We suppose that there are only order items
+					$buyable = $attribute->Buyable(true);
+					$attributeFields = array(
+						'LineNumber' => count($fields['SalesOrderLines']) + 1,
+						'Product' => array('Guid' => $buyable->GUID),
+						'OrderQuantity' => $attribute->Quantity,
+						'UnitPrice' => $attribute->UnitPrice,
+						'LineTotal' => $attribute->Total()
+					);
+					if(isset($tax)) { // We suppose it's GSTTaxModifier
+						$attributeFields['TaxRate'] = $tax->CurrentRate;
+						if($tax->TaxType == 'Inclusive') {
+							foreach(array('UnitPrice', 'LineTotal') as $name) {
+								$attributeFields[$name] = $attributeFields[$name] / (1 + $tax->CurrentRate);
+							}
+						}
+						$attributeFields['LineTax'] = $attributeFields['LineTotal'] * $tax->CurrentRate;
+					}
+					$subTotal += $attributeFields['LineTotal'];
+					$fields['SalesOrderLines'][] = $attributeFields;
+					// Todo : deal with other modifiers like delivery
+				}
+			}
+		}
+		$fields['SubTotal'] = $subTotal;
 		return $fields;
 	}
 
