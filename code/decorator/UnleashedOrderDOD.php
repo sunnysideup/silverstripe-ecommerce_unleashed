@@ -33,7 +33,7 @@ class UnleashedOrderDOD extends UnleashedObjectDOD {
 	static $exclude_attribute_classes = array();
 
 	protected function onAfterWriteStart() {
-		if($this->owner->IsSubmitted()) {
+		if($this->owner->IsSubmitted() && ! $this->owner->GUID) {
 			parent::onAfterWriteStart();
 		}
 	}
