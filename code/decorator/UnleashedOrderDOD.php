@@ -156,7 +156,7 @@ class UnleashedOrderDOD extends UnleashedObjectDOD {
 			}
 		}
 		$subTotal = 0;
-		$fields['SalesOrderLines'] = array();
+		$lines = array();
 		$attributes = $this->owner->Attributes();
 		foreach($attributes as $attribute) {
 			if($attribute->ClassName != self::$attribute_tax_class) {
@@ -164,7 +164,7 @@ class UnleashedOrderDOD extends UnleashedObjectDOD {
 					// We suppose that there are only order items
 					$buyable = $attribute->Buyable(true);
 					$attributeFields = array(
-						'LineNumber' => count($fields['SalesOrderLines']) + 1,
+						'LineNumber' => count($lines) + 1,
 						'Product' => array('Guid' => $buyable->GUID),
 						'OrderQuantity' => $attribute->Quantity,
 						'UnitPrice' => $attribute->UnitPrice,
@@ -180,11 +180,12 @@ class UnleashedOrderDOD extends UnleashedObjectDOD {
 						$attributeFields['LineTax'] = round($attributeFields['LineTotal'] * $tax->CurrentRate, 2);
 					}
 					$subTotal += $attributeFields['LineTotal'];
-					$fields['SalesOrderLines']['SalesInvoiceLine'][] = $attributeFields;
+					$lines[] = $attributeFields;
 					// Todo : deal with other modifiers like delivery
 				}
 			}
 		}
+		$fields['SalesOrderLines']['SalesInvoiceLine'] = $lines;
 		$fields['SubTotal'] = $subTotal;
 		return $fields;
 	}
