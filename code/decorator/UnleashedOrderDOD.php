@@ -66,7 +66,7 @@ class UnleashedOrderDOD extends UnleashedObjectDOD {
 
 			$tax = $this->getUTax();
 			if(! $tax) {
-				return $this->notifyError('SS_FIELDS_MISSING', 'Tax');
+				return $this->notifyError('SS_FIELDS_MISSING', 'Unleashed Tax');
 			}
 
 			return true;
@@ -93,10 +93,20 @@ class UnleashedOrderDOD extends UnleashedObjectDOD {
 			// ExchangeRate
 			// DiscountRate
 			'Tax' => array('Guid' => $tax['Guid']),
-			// 'TaxRate' => ,
+			// TaxRate
+			// XeroTaxCode
 			'SubTotal' => $order->SubTotal(),
-			// 'TaxTotal' => ,
+			// TaxTotal
 			'Total' => $order->Total()
+			// TotalVolume
+			// TotalWeight
+			// BCSubTotal
+			// BCTaxTotal
+			// BCTotal
+			// PaymentDueDate
+			// SalesPerson
+			// SalesOrderLines
+			// LastModifiedOn
 		);
 		if($order->CanHaveShippingAddress()) {
 			$address = $order->ShippingAddress();
