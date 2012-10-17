@@ -177,10 +177,10 @@ class UnleashedOrderDOD extends UnleashedObjectDOD {
 								$attributeFields[$name] = $attributeFields[$name] / (1 + $tax->CurrentRate);
 							}
 						}
-						$attributeFields['LineTax'] = $attributeFields['LineTotal'] * $tax->CurrentRate;
+						$attributeFields['LineTax'] = round($attributeFields['LineTotal'] * $tax->CurrentRate, 2);
 					}
 					$subTotal += $attributeFields['LineTotal'];
-					$fields['SalesOrderLines'][] = $attributeFields;
+					$fields['SalesOrderLines']['SalesInvoiceLine'][] = $attributeFields;
 					// Todo : deal with other modifiers like delivery
 				}
 			}
