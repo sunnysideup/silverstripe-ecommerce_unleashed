@@ -16,6 +16,10 @@ abstract class UnleashedObjectDOD extends DataObjectDecorator {
 		return array('db' => array('GUID' => "Varchar($length)"));
 	}
 
+	function updateCMSFields(FieldSet &$fields) {
+		$fields->removeByName('GUID');
+	}
+
 	/**
 	 * Syncronisation call for @see SiteTree only when published
 	 */
