@@ -11,7 +11,7 @@ class UnleashedMemberDOD extends UnleashedObjectDOD {
 		$sync = parent::synchroniseUDatabase();
 		$orders = DataObject::get('Order', "MemberID = {$this->owner->ID}"); // $this->owner->Orders() does not work. Has EcommerceRole been added properly ?
 		if($sync && $orders) {
-			$name = $this->owner->getName();
+			$name = $this->owner->Surname; // Company Name : FOR KAHUVET ONLY
 			if(empty($name)) {
 				return $this->notifyError('SS_FIELDS_MISSING', 'Name');
 			}
@@ -21,7 +21,7 @@ class UnleashedMemberDOD extends UnleashedObjectDOD {
 
 	function getUFields() {
 		return array(
-			'CustomerName' => $this->owner->getName(),
+			'CustomerName' => $this->owner->Surname, // Company Name : FOR KAHUVET ONLY
 			'Email' => $this->owner->Email,
 			'Notes' => $this->owner->Notes
 		);
