@@ -191,12 +191,12 @@ class UnleashedOrderDOD extends UnleashedObjectDOD {
 		$fields['SubTotal'] = $subTotal;
 		if(isset($tax)) {
 			$fields['TaxTotal'] = $taxTotal;
-			if($tax->CalculatedTotal != round($taxTotal, 2)) {
+			if(bccomp($tax->CalculatedTotal, round($taxTotal, 2)) !== 0) {
 				$errors[] = 'Tax';
 			}
 		}
 		$fields['Total'] = $subTotal + $taxTotal;
-		if($this->owner->Total != round($fields['Total'], 2)) {
+		if(bccomp($order->Total, round($fields['Total'], 2)) !== 0) {
 			$errors[] = 'Total';
 		}
 		if(isset($errors)) {
