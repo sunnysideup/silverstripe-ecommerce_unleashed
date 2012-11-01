@@ -110,13 +110,14 @@ class UnleashedOrderDOD extends UnleashedObjectDOD {
 			$customerRef = $customerRef->First();
 			$customerRef = $customerRef->OrderFor;
 		}
+		$submissionLog = $order->SubmissionLog();
 		$fields = array(
-			'OrderDate' => str_replace(' ', 'T', $order->Created), // XSD format
+			'OrderDate' => str_replace(' ', 'T', $submissionLog->Created), // XSD format
 			// QuoteExpiryDate
 			// RequiredDate
 			'OrderStatus' => 'Parked', // Whatever we enter, it's always Parked. Used to be $order->getCustomerStatus(false),
 			'Customer' => $order->Member()->getUFieldsForOrder(),
-			'CustomerRef' => $customerRef ? $customerRef : null, // FOR KAHUVET ONLY
+			'CustomerRef' => $customerRef,
 			'Comments' => $order->CustomerOrderNote,
 			// Warehouse
 			// ReceivedDate
