@@ -5,7 +5,7 @@
  *       occuring when you enter a more than 30 characters long Internal Item ID.
  */
 class UnleashedVariationDOD extends UnleashedObjectDOD {
-	
+
 	static $u_class = 'Products';
 	static $unique_fields = array('ProductCode', 'InternalItemID');
 
@@ -64,8 +64,11 @@ class UnleashedVariationDOD extends UnleashedObjectDOD {
 		$attributeValues = $this->owner->AttributeValuesSorted();
 		if($attributeValues->Count() > 0) {
 			foreach($attributeValues as $attributeValue) {
-				$attributeType = $attributeValue->Type();
-				$attributes[] = "$attributeType->Name : $attributeValue->Value";
+				$attributes = array();
+				if(is_object($attributeValue)) {
+					$attributeType = $attributeValue->Type();
+					$attributes[] = "$attributeType->Name : $attributeValue->Value";
+				}
 			}
 			return $attributes;
 		}
