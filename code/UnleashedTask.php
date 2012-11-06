@@ -60,7 +60,7 @@ class UnleashedTask_AdminEXT extends Extension {
 
 	static $allowed_actions = array('unleashedTask' => true);
 
-	function updateEcommerceDevMenuMigrations($tasks) {
+	function updateEcommerceDevMenuConfig($tasks) {
 		$tasks[] = 'unleashedTask';
 		return $tasks;
 	}
